@@ -90,5 +90,5 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados da pessoa
         results = json.loads(response.content)
-        print("Dados da coleção")
-        print(results)
+        # print("Dados da coleção")
+        # print(results)
