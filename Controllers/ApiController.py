@@ -4,9 +4,6 @@ class ApiController():
     def __init__(self, mainController):  
         self.mainController = mainController
         self.apiKey = "619e50c9f8b2c6aacab7bbc2db6c67a7"
-        self.searchMovie()
-        # self.getGenres()
-        # self.searchPerson()
 
     # Procura por um filme especifico pelo input do usuário
     def searchMovie(self):
@@ -30,12 +27,12 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados do filme
         results = json.loads(response.content)
+        # Envia o resultado pra controller principal
+        self.mainController.populateMovie(results)
+        # Verifica se o filme pertence a uma coleção
         if (results["belongs_to_collection"]["id"]):
             collectionId = results["belongs_to_collection"]["id"]
             self.getCollection(collectionId)
-
-        # print("Dados do filme")
-        # print(results)
 
     # Busca todos os gêneros cadastrados
     def getGenres(self):
@@ -45,8 +42,8 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados dos generos cadastrados
         results = json.loads(response.content)["genres"]
-        # print("Gêneros de filme")
-        # print (results)
+        # Envia o resultado pra controller principal
+        self.mainController.populateGenres(results)
 
     # Busca os créditos a partir do id de um filme
     def getCredits(self, movieId):
@@ -90,5 +87,5 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados da pessoa
         results = json.loads(response.content)
-        # print("Dados da coleção")
-        # print(results)
+        # Envia o resultado pra controller principal
+        self.mainController.populateCollection(results)
