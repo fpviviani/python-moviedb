@@ -15,6 +15,10 @@ class MainController():
     def populateMovie(self, movieJson):
         self.db.saveMovie(movieJson)
 
+    # Salva no postgresql os gêneros de um filme
+    def populateMovieGenres(self, movieId, genresJson):
+        self.db.saveMovieGenres(movieId, genresJson)
+
     # Salva todos os gêneros no postgresql
     def populateGenres(self, genresJson):
         self.db.saveGenres(genresJson)

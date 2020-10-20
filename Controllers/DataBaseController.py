@@ -6,9 +6,9 @@ class DataBaseController():
         self.mainController = mainController
         # Instancia variáveis da db
         self.dbHost = "localhost"
-        self.dbName = "moviedb3"
+        self.dbName = "moviedb"
         self.dbUser = "postgres"
-        self.dbPassword = "123456"
+        self.dbPassword = "postgres"
 
     # Inicia a conexão com o postgresql
     def startConnection(self):
@@ -49,10 +49,27 @@ class DataBaseController():
         try:
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nFilme " + originalTitle + " salvo com sucesso!")
+            print("\nFilme " + title + " salvo com sucesso!")
+            # Salva no banco cada gênero do filme
+            self.mainController.populateMovieGenres(movieId, movieJson["genres"])
         except:
             self.connection.rollback()
             pass
+
+    # Salva todos os gêneros de um filme no postgresql
+    def saveMovieGenres(self, movieId, genresJson):
+        for genre in genresJson:
+            genreId = str(genre["id"])
+            # Monta a query sql
+            sql = "insert into movie_genres values (" + movieId + ", " + genreId + ")"
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql)
+                self.connection.commit()
+            except:
+                self.connection.rollback()
+                pass
+        print("\nGênero(s) do filme salvo(s) com sucesso!")
 
     # Salva todos os gêneros no postgresql
     def saveGenres(self, genresJson):
