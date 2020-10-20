@@ -23,6 +23,10 @@ class MainController():
     def populateGenres(self, genresJson):
         self.db.saveGenres(genresJson)
 
+    # Salva no postgresql as companhias de produção e salva os produtores de um filme
+    def pupulateProductionCompanies(self, movieId, companiesJson):
+        self.db.saveProductionCompanies(movieId, companiesJson)
+
     # Salva no postgresql uma coleção específica
     def populateCollection(self, collectionJson):
         self.db.saveCollection(collectionJson)

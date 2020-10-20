@@ -52,6 +52,8 @@ class DataBaseController():
             print("\nFilme " + title + " salvo com sucesso!")
             # Salva no banco cada gênero do filme
             self.mainController.populateMovieGenres(movieId, movieJson["genres"])
+            # Salva no banco cada companhia de produção do filme
+            self.mainController.pupulateProductionCompanies(movieId, movieJson["production_companies"])
         except:
             self.connection.rollback()
             pass
@@ -86,6 +88,34 @@ class DataBaseController():
                 self.connection.rollback()
                 pass
         print("\nGêneros salvos com sucesso!")
+
+    # Salva no postgresql as companhias de produção
+    def saveProductionCompanies(self, movieId, companiesJson):
+        for company in companiesJson:
+            companyId = str(company["id"])
+            companyName = str(company["name"])
+            companyOriginCountry = str(company["origin_country"])
+            # Monta a query sql
+            # Salvar a companhia de produção
+            sql = "insert into production_companies values (" + companyId + ", '" + companyName + "', '" + companyOriginCountry + "')"
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql)
+                self.connection.commit()
+            except:
+                self.connection.rollback()
+                pass
+
+            # Salvar a companhia de produção do filme específico
+            sql = "insert into movie_production_companies values (" + movieId + ", " + companyId + ")"
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql)
+                self.connection.commit()
+            except:
+                self.connection.rollback()
+                pass
+        print("\nCompanhia(s) de Produção do filme salva(s) com sucesso!")
 
     # Salva no postgresql uma coleção específica
     def saveCollection(self, collectionJson):
