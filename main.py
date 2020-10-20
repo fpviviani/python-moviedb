@@ -8,7 +8,8 @@ class MainController():
         self.db = DB.DataBaseController(self)
         self.db.startConnection()
         self.api.getGenres()
-        self.api.searchMovie()
+        # self.api.searchMovie()
+        self.api.getTrendingMovies()
 
     # Salva no postgresql um filme específico
     def populateMovie(self, movieJson):
