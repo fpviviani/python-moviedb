@@ -30,5 +30,9 @@ class MainController():
     def getMovie(self, movieId):
         self.api.getMovie(movieId)
 
+    # Busca todos os dados de uma coleção específica a partir do seu id
+    def getCollection(self, collectionId):
+        self.api.getCollection(collectionId)
+
 if __name__ == '__main__':
     mainController = MainController()

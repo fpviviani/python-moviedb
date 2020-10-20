@@ -29,10 +29,6 @@ class ApiController():
         results = json.loads(response.content)
         # Envia o resultado pra controller principal
         self.mainController.populateMovie(results)
-        # Verifica se o filme pertence a uma coleção
-        if (results["belongs_to_collection"]["id"]):
-            collectionId = results["belongs_to_collection"]["id"]
-            self.getCollection(collectionId)
 
     # Busca todos os gêneros cadastrados
     def getGenres(self):
