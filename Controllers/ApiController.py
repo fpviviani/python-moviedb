@@ -72,8 +72,8 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados da pessoa
         results = json.loads(response.content)
-        # print("Dados da pessoa")
-        # print(results)
+        # Envia o resultado pra controller principal
+        self.mainController.populatePerson(results)
 
     # Busca todos os dados de uma coleção específica a partir do seu id
     def getCollection(self, collectionId):
@@ -106,5 +106,6 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa as pessoas que estão no trending
         results = json.loads(response.content)["results"]
-        print("Trending Pessoas")
-        print(results)
+        # Percorre cada pessoa do trending e salva no banco
+        for person in results:
+            self.getPerson(person["id"])
