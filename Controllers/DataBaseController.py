@@ -77,6 +77,9 @@ class DataBaseController():
             self.cursor.execute(sql)
             self.connection.commit()
             print("\nColeção " + collectionName + " salva com sucesso!")
+            for part in collectionJson["parts"]:
+                for movie in part:
+                    self.mainController.getMovie(movie["id"])
         except:
             self.connection.rollback()
             pass
