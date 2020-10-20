@@ -79,13 +79,35 @@ class ApiController():
         # print("Dados da pessoa")
         # print(results)
 
-    # Busca todos os dados de uma coelção específica a partir do seu id
+    # Busca todos os dados de uma coleção específica a partir do seu id
     def getCollection(self, collectionId):
         # Monta a url da request que será feita
         requestUrl = "https://api.themoviedb.org/3/collection/"+str(collectionId)+"?api_key=" + self.apiKey
         # Pega o conteudo da resposta
         response = requests.get(requestUrl)
-        # Separa os dados da pessoa
+        # Separa os dados da coleção
         results = json.loads(response.content)
         # Envia o resultado pra controller principal
         self.mainController.populateCollection(results)
+
+    # Busca os filmes que estão no trending
+    def getTrendingMovies(self):
+        # Monta a url da request que será feita
+        requestUrl = "https://api.themoviedb.org/3/trending/movie/day?api_key=" + self.apiKey
+        # Pega o conteudo da resposta
+        response = requests.get(requestUrl)
+        # Separa os filmes que estão no trending
+        results = json.loads(response.content)["results"]
+        print("Trending Filmes")
+        print(results)
+
+    # Busca as pessoas que estão no trending
+    def getTrendingPeople(self):
+        # Monta a url da request que será feita
+        requestUrl = "https://api.themoviedb.org/3/trending/person/day?api_key=" + self.apiKey
+        # Pega o conteudo da resposta
+        response = requests.get(requestUrl)
+        # Separa as pessoas que estão no trending
+        results = json.loads(response.content)["results"]
+        print("Trending Pessoas")
+        print(results)
