@@ -5,6 +5,26 @@ class MainController():
     def __init__(self):
         # Instancia a controller que será responsável pelas requests
         self.api = API.ApiController(self)
+        self.db = DB.DataBaseController(self)
+        self.db.startConnection()
+        self.api.getGenres()
+        self.api.searchMovie()
+
+    # Salva no postgresql um filme específico
+    def populateMovie(self, movieJson):
+        self.db.saveMovie(movieJson)
+
+    # Salva todos os gêneros no postgresql
+    def populateGenres(self, genresJson):
+        self.db.saveGenres(genresJson)
+
+    # Salva no postgresql uma coleção específica
+    def populateCollection(self, collectionJson):
+        self.db.saveCollection(collectionJson)
+
+    # Encerra a conexão com o banco após o uso
+    def closeConnection(self):
+        self.db.closeConnection()
 
 if __name__ == '__main__':
     mainController = MainController()
