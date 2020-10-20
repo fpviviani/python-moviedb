@@ -94,9 +94,10 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os filmes que estão no trending
         results = json.loads(response.content)["results"]
-        print("Trending Filmes")
-        print(results)
-
+        # Percorre cada filme do trending e salva no banco
+        for movie in results:
+            self.getMovie(movie["id"])
+            
     # Busca as pessoas que estão no trending
     def getTrendingPeople(self):
         # Monta a url da request que será feita
