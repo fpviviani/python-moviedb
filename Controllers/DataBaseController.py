@@ -54,6 +54,8 @@ class DataBaseController():
             self.mainController.populateMovieGenres(movieId, movieJson["genres"])
             # Salva no banco cada companhia de produção do filme
             self.mainController.pupulateProductionCompanies(movieId, movieJson["production_companies"])
+            # Salva no banco cada país de produção do filme
+            self.mainController.pupulateProductionCountries(movieId, movieJson["production_countries"])
         except:
             self.connection.rollback()
             pass
@@ -107,7 +109,24 @@ class DataBaseController():
                 pass
 
             # Salvar a companhia de produção do filme específico
-            sql = "insert into movie_production_companies values (" + movieId + ", " + companyId + ")"
+            sql2 = "insert into movie_production_companies values (" + movieId + ", " + companyId + ")"
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql2)
+                self.connection.commit()
+            except:
+                self.connection.rollback()
+                pass
+        print("\nCompanhia(s) de Produção do filme salva(s) com sucesso!")
+
+    # Salva no postgresql os países de produção do filme
+    def saveProductionCountries(self, movieId, countriesJson):
+        for country in countriesJson:
+            countryId = str(country["iso_3166_1"])
+            countryName = str(country["name"])
+            # Monta a query sql
+            # Salvar o país de produção
+            sql = "insert into production_countries values ('" + countryId + "', '" + countryName + "')"
             try:
                 # Executa a query sql no banco
                 self.cursor.execute(sql)
@@ -115,7 +134,17 @@ class DataBaseController():
             except:
                 self.connection.rollback()
                 pass
-        print("\nCompanhia(s) de Produção do filme salva(s) com sucesso!")
+
+            # Salvar o país de produção do filme específico
+            sql2 = "insert into movie_production_countries values (" + movieId + ", '" + countryId + "')"
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql2)
+                self.connection.commit()
+            except:
+                self.connection.rollback()
+                pass
+        print("\nPaís(es) de Produção do filme salvo(s) com sucesso!")
 
     # Salva no postgresql uma coleção específica
     def saveCollection(self, collectionJson):
