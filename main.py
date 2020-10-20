@@ -27,8 +27,8 @@ class MainController():
         self.db.closeConnection()
 
     # Busca todos os dados de um filme específico a partir do seu id
-    def getMovie(movieId):
-        self.db.getMovie(movieId)
+    def getMovie(self, movieId):
+        self.api.getMovie(movieId)
 
 if __name__ == '__main__':
     mainController = MainController()

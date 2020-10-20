@@ -77,6 +77,7 @@ class DataBaseController():
             self.cursor.execute(sql)
             self.connection.commit()
             print("\nColeção " + collectionName + " salva com sucesso!")
+            # Salva no banco cada filme da coleção
             for part in collectionJson["parts"]:
                 for movie in part:
                     self.mainController.getMovie(movie["id"])
