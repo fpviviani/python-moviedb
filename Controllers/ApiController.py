@@ -29,6 +29,7 @@ class ApiController():
         results = json.loads(response.content)
         # Envia o resultado pra controller principal
         self.mainController.populateMovie(results)
+        self.getCredits(movieId)
 
     # Busca todos os gêneros cadastrados
     def getGenres(self):
@@ -49,9 +50,21 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados dos créditos do filme buscado
         results = json.loads(response.content)["cast"]
-        # print("Créditos do filme")
-        # print (results)
+        # Percorre cada crédito do filme obtendo mais detalhes sobre o mesmo
+        for credit in results:
+            self.getCreditDetails(credit["credit_id"], credit["id"])
 
+    # Busca os detalhes de um crédito específico a partir de sua id
+    def getCreditDetails(self, creditId, personId):
+        # Monta a url da request que será feita
+        requestUrl = "https://api.themoviedb.org/3/credit/"+str(creditId)+"?api_key="+self.apiKey
+        # Pega o conteudo da resposta
+        response = requests.get(requestUrl)
+        # Separa os dados dos créditos do filme buscado
+        results = json.loads(response.content)
+        # Envia o resultado pra controller principal
+        self.mainController.populateCollection(results, personId, creditId)
+        
     # Procura por uma pessoa especifica pelo input do usuário
     def searchPerson(self):
         query = str(input('Digite a pessoa pela qual deseja pesquisar: '))

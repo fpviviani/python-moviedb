@@ -8,8 +8,8 @@ class MainController():
         self.db = DB.DataBaseController(self)
         self.db.startConnection()
         self.api.getGenres()
-        # self.api.searchMovie()
-        self.api.getTrendingMovies()
+        self.api.searchMovie()
+        # self.api.getTrendingMovies()
 
     # Salva no postgresql um filme específico
     def populateMovie(self, movieJson):
@@ -31,6 +31,10 @@ class MainController():
     def populateCollection(self, collectionJson):
         self.db.saveCollection(collectionJson)
 
+    # Salva no postgresql um crédito específico
+    def populateCredit(self, creditJson, personId, creditId):
+        self.db.saveCredit(creditJson, personId, creditId)
+
     # Encerra a conexão com o banco após o uso
     def closeConnection(self):
         self.db.closeConnection()
@@ -38,6 +42,10 @@ class MainController():
     # Busca todos os dados de um filme específico a partir do seu id
     def getMovie(self, movieId):
         self.api.getMovie(movieId)
+
+    # Busca todos os dados de uma pessoa específica a partir do seu id
+    def getPerson(self, personId):
+        self.api.getPerson(personId)
 
     # Busca todos os dados de uma coleção específica a partir do seu id
     def getCollection(self, collectionId):

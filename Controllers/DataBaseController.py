@@ -6,9 +6,9 @@ class DataBaseController():
         self.mainController = mainController
         # Instancia variáveis da db
         self.dbHost = "localhost"
-        self.dbName = "moviedb"
+        self.dbName = "moviedb3"
         self.dbUser = "postgres"
-        self.dbPassword = "postgres"
+        self.dbPassword = "123456"
 
     # Inicia a conexão com o postgresql
     def startConnection(self):
@@ -131,6 +131,28 @@ class DataBaseController():
             # Salva no banco cada filme da coleção
             for part in collectionJson["parts"]:
                 self.mainController.getMovie(part["id"])
+        except:
+            self.connection.rollback()
+            pass
+
+    # Salva no postgresql um crédito específico
+    def saveCredit(self, creditJson, personId, creditId):
+        self.mainController.getPerson(personId)
+        time.sleep(3)
+        creditType = str(creditJson["credit_type"]).replace("'", "''")
+        creditDepartment = str(creditJson["department"]).replace("'", "''")
+        creditJob = str(creditJson["job"]).replace("'", "''")
+        creditCharacter = str(creditJson["character"]).replace("'", "''")
+        movieId = str(creditJson["id"])
+
+        # Monta a query sql
+        sql = "insert into credits values (" + creditId + ", '" + creditType + "', '" + creditDepartment + "', '" + creditJob + \
+            "', '" + creditCharacter + "', " + movieId + ", " + personId + ")"
+        # Executa a query sql no banco
+        try:
+            self.cursor.execute(sql)
+            self.connection.commit()
+            print("\nCrédito " + creditId + " salvo com sucesso!")
         except:
             self.connection.rollback()
             pass
