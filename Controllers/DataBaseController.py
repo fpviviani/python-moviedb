@@ -21,30 +21,36 @@ class DataBaseController():
 
     # Salva no postgresql um filme específico
     def saveMovie(self, movieJson):
-        originalTitle = str(movieJson["original_title"]).replace("'", " ")
         movieId = str(movieJson["id"])
-        originalLanguage = str(movieJson["original_language"])
+        originalTitle = str(movieJson["original_title"]).replace("'", " ")
+        originalLanguage = str(movieJson["original_language"]).replace("'", " ")
         popularity = str(movieJson["popularity"])
         status = str(movieJson["status"])
         title = str(movieJson["title"]).replace("'", " ")
         voteAverage = str(movieJson["vote_average"])
         voteCount = str(movieJson["vote_count"])
-        releaseDate = str(movieJson["release_date"])
         budget = str(movieJson["budget"])
         revenue = str(movieJson["revenue"])
         runtime = str(movieJson["runtime"])
-        if (movieJson["belongs_to_collection"] != None):
+        # print(movieJson)
+        if (movieJson["belongs_to_collection"] != "null"):
             collectionId = str(movieJson["belongs_to_collection"]["id"])
             self.mainController.getCollection(collectionId)
             # É necessário criar a coleção antes, já que se trata de uma fk, então o sleep
             time.sleep(3)
         else:
             collectionId = "null"
+
         # Monta a query sql
         sql = "insert into movies " + \
-            "values (" + movieId + ", '" + originalLanguage + "', '" + originalTitle + "', " + popularity + ", '" + \
-            status + "', '" + title + "', " + voteAverage + ", " + voteCount + ", to_date('" + \
-            releaseDate + "', 'yyyy-mm-dd'), " + budget + ", " + revenue + ", " + runtime + ", " + collectionId + ")"
+              "values (" + movieId + ", '" + originalLanguage + "', '" + originalTitle + "', " + popularity + ", '" + \
+              status + "', '" + title + "', " + voteAverage + ", " + voteCount + ", "
+
+        releaseDate = str(movieJson["release_date"])
+        if (releaseDate != "null"):
+            sql += "to_date('" + releaseDate + "', 'yyyy-mm-dd'), " + budget + ", " + revenue + ", " + runtime + ", " + collectionId + ")"
+        else:
+            sql += releaseDate + ", " + budget + ", " + revenue + ", " + runtime + ", " + collectionId + ")"
         # Executa a query sql no banco
         try:
             self.cursor.execute(sql)
@@ -54,6 +60,8 @@ class DataBaseController():
             self.mainController.populateMovieGenres(movieId, movieJson["genres"])
             # Salva no banco cada companhia de produção do filme
             self.mainController.pupulateProductionCompanies(movieId, movieJson["production_companies"])
+            # Salva no banco cada país de produção do filme
+            self.mainController.pupulateProductionCountries(movieId, movieJson["production_countries"])
         except:
             self.connection.rollback()
             pass
@@ -77,7 +85,7 @@ class DataBaseController():
     def saveGenres(self, genresJson):
         for genre in genresJson:
             genreId = str(genre["id"])
-            genreName = str(genre["name"])
+            genreName = str(genre["name"]).replace("'", " ")
             # Monta a query sql
             sql = "insert into genres values (" + genreId + ", '" + genreName + "')"
             try:
@@ -93,8 +101,8 @@ class DataBaseController():
     def saveProductionCompanies(self, movieId, companiesJson):
         for company in companiesJson:
             companyId = str(company["id"])
-            companyName = str(company["name"])
-            companyOriginCountry = str(company["origin_country"])
+            companyName = str(company["name"]).replace("'", " ")
+            companyOriginCountry = str(company["origin_country"]).replace("'", " ")
             # Monta a query sql
             # Salvar a companhia de produção
             sql = "insert into production_companies values (" + companyId + ", '" + companyName + "', '" + companyOriginCountry + "')"
@@ -107,7 +115,24 @@ class DataBaseController():
                 pass
 
             # Salvar a companhia de produção do filme específico
-            sql = "insert into movie_production_companies values (" + movieId + ", " + companyId + ")"
+            sql2 = "insert into movie_production_companies values (" + movieId + ", " + companyId + ")"
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql2)
+                self.connection.commit()
+            except:
+                self.connection.rollback()
+                pass
+        print("\nCompanhia(s) de Produção do filme salva(s) com sucesso!")
+
+    # Salva no postgresql os países de produção do filme
+    def saveProductionCountries(self, movieId, countriesJson):
+        for country in countriesJson:
+            countryId = str(country["iso_3166_1"])
+            countryName = str(country["name"]).replace("'", " ")
+            # Monta a query sql
+            # Salvar o país de produção
+            sql = "insert into production_countries values ('" + countryId + "', '" + countryName + "')"
             try:
                 # Executa a query sql no banco
                 self.cursor.execute(sql)
@@ -115,7 +140,17 @@ class DataBaseController():
             except:
                 self.connection.rollback()
                 pass
-        print("\nCompanhia(s) de Produção do filme salva(s) com sucesso!")
+
+            # Salvar o país de produção do filme específico
+            sql2 = "insert into movie_production_countries values (" + movieId + ", '" + countryId + "')"
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql2)
+                self.connection.commit()
+            except:
+                self.connection.rollback()
+                pass
+        print("\nPaís(es) de Produção do filme salvo(s) com sucesso!")
 
     # Salva no postgresql uma coleção específica
     def saveCollection(self, collectionJson):
@@ -142,17 +177,51 @@ class DataBaseController():
         creditType = str(creditJson["credit_type"]).replace("'", "''")
         creditDepartment = str(creditJson["department"]).replace("'", "''")
         creditJob = str(creditJson["job"]).replace("'", "''")
-        creditCharacter = str(creditJson["character"]).replace("'", "''")
+        if(creditType != "crew"):
+            creditCharacter = str(creditJson["media"]["character"]).replace("'", "''")
+        else:
+            creditCharacter = "null"
         movieId = str(creditJson["id"])
 
         # Monta a query sql
-        sql = "insert into credits values (" + creditId + ", '" + creditType + "', '" + creditDepartment + "', '" + creditJob + \
-            "', '" + creditCharacter + "', " + movieId + ", " + personId + ")"
+        sql = "insert into credits values (" + str(creditId) + ", '" + creditType + "', '" + creditDepartment + "', '" + creditJob + \
+            "', '" + creditCharacter + "', " + movieId + ", " + str(personId) + ")"
         # Executa a query sql no banco
         try:
             self.cursor.execute(sql)
             self.connection.commit()
             print("\nCrédito " + creditId + " salvo com sucesso!")
+        except:
+            self.connection.rollback()
+            pass
+
+    # Salva no postgresql uma pessoa específica
+    def savePerson(self, personJson):
+        personId = str(personJson["id"])
+        name = str(personJson["name"]).replace("'", " ")
+        gender = str(personJson["gender"])
+        popularity = str(personJson["popularity"])
+        place_of_birth = str(personJson["place_of_birth"]).replace("'", " ")
+        known_for_department = str(personJson["known_for_department"]).replace("'", " ")
+        # Monta a query sql
+        sql = "insert into people " + \
+              "values (" + personId + ", '" + name + "', " + gender + ", " + popularity + ", '" + \
+              place_of_birth + "', "
+        birthday = str(personJson["birthday"])
+        if (birthday != "null"):
+            sql += "to_date('" + birthday + "', 'yyyy-mm-dd'), "
+        else:
+            sql += birthday + ", "
+        deathday = str(personJson["deathday"])
+        if (deathday != "null"):
+            sql += "to_date('" + deathday + "', 'yyyy-mm-dd'), '" + known_for_department + "')"
+        else:
+            sql += deathday + ", '" + known_for_department + "')"
+        # Executa a query sql no banco
+        try:
+            self.cursor.execute(sql)
+            self.connection.commit()
+            print("\nPessoa: " + name + " salva com sucesso!")
         except:
             self.connection.rollback()
             pass
