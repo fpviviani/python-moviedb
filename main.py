@@ -8,7 +8,6 @@ class MainController():
         self.db = DB.DataBaseController(self)
         self.db.startConnection()
         self.api.getGenres()
-        # self.api.searchMovie()
         self.api.getTrendingMovies()
         self.api.getTrendingPeople()
 
