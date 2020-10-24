@@ -27,8 +27,12 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados do filme
         results = json.loads(response.content)
-        # Envia o resultado pra controller principal
-        self.mainController.populateMovie(results)
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Envia o resultado pra controller principal
+            self.mainController.populateMovie(results)
+            self.getCredits(movieId)
 
     # Busca todos os gêneros cadastrados
     def getGenres(self):
@@ -38,8 +42,11 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados dos generos cadastrados
         results = json.loads(response.content)["genres"]
-        # Envia o resultado pra controller principal
-        self.mainController.populateGenres(results)
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Envia o resultado pra controller principal
+            self.mainController.populateGenres(results)
 
     # Busca os créditos a partir do id de um filme
     def getCredits(self, movieId):
@@ -49,9 +56,27 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados dos créditos do filme buscado
         results = json.loads(response.content)["cast"]
-        # print("Créditos do filme")
-        # print (results)
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Percorre cada crédito do filme obtendo mais detalhes sobre o mesmo
+            for credit in results:
+                self.getCreditDetails(credit["credit_id"], credit["id"])
 
+    # Busca os detalhes de um crédito específico a partir de sua id
+    def getCreditDetails(self, creditId, personId):
+        # Monta a url da request que será feita
+        requestUrl = "https://api.themoviedb.org/3/credit/"+str(creditId)+"?api_key="+self.apiKey
+        # Pega o conteudo da resposta
+        response = requests.get(requestUrl)
+        # Separa os dados dos créditos do filme buscado
+        results = json.loads(response.content)
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Envia o resultado pra controller principal
+            self.mainController.populateCredit(results, personId, creditId)
+        
     # Procura por uma pessoa especifica pelo input do usuário
     def searchPerson(self):
         query = str(input('Digite a pessoa pela qual deseja pesquisar: '))
@@ -61,8 +86,11 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados apenas da primeira pessoa encontrada
         results = json.loads(response.content)["results"][0]
-        # Consulta os dados da pessoa
-        self.getPerson(results.get("id"))
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Consulta os dados da pessoa
+            self.getPerson(results.get("id"))
 
     # Busca todos os dados de uma pessoa específica a partir do seu id
     def getPerson(self, personId):
@@ -72,8 +100,11 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados da pessoa
         results = json.loads(response.content)
-        # Envia o resultado pra controller principal
-        self.mainController.populatePerson(results)
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Envia o resultado pra controller principal
+            self.mainController.populatePerson(results)
 
     # Busca todos os dados de uma coleção específica a partir do seu id
     def getCollection(self, collectionId):
@@ -83,8 +114,11 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os dados da coleção
         results = json.loads(response.content)
-        # Envia o resultado pra controller principal
-        self.mainController.populateCollection(results)
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Envia o resultado pra controller principal
+            self.mainController.populateCollection(results)
 
     # Busca os filmes que estão no trending
     def getTrendingMovies(self):
@@ -94,9 +128,12 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa os filmes que estão no trending
         results = json.loads(response.content)["results"]
-        # Percorre cada filme do trending e salva no banco
-        for movie in results:
-            self.getMovie(movie["id"])
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Percorre cada filme do trending e salva no banco
+            for movie in results:
+                self.getMovie(movie["id"])
             
     # Busca as pessoas que estão no trending
     def getTrendingPeople(self):
@@ -106,6 +143,30 @@ class ApiController():
         response = requests.get(requestUrl)
         # Separa as pessoas que estão no trending
         results = json.loads(response.content)["results"]
-        # Percorre cada pessoa do trending e salva no banco
-        for person in results:
-            self.getPerson(person["id"])
+        # Checa se a request deu certo
+        results = self.verifyRequest(response, results)
+        if(results != False):
+            # Percorre cada pessoa do trending e salva no banco
+            for person in results:
+                self.getPerson(person["id"])
+
+    # Verifica se a request foi bem sucedida
+    def verifyRequest(self, response, results):
+        # Se o código de status da request não for o código positivo, retorna falso
+        if (response.status_code != 200):
+            return False
+        results = self.verifyNone(results)
+        return results
+    
+    # Verifica se dentre as informações retornadas, alguma se encontra vazia
+    def verifyNone(self, results):
+        for result in results:
+            if(type(result) is dict):
+                for key in result:
+                    if(result[key] is None):
+                        result[key] = "null"
+            else:
+                if(results[result] is None):
+                    results[result] = "null"
+        return results    
+        

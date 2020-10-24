@@ -6,9 +6,9 @@ class DataBaseController():
         self.mainController = mainController
         # Instancia variáveis da db
         self.dbHost = "localhost"
-        self.dbName = "moviedb"
+        self.dbName = "moviedb3"
         self.dbUser = "postgres"
-        self.dbPassword = "postgres"
+        self.dbPassword = "123456"
 
     # Inicia a conexão com o postgresql
     def startConnection(self):
@@ -29,32 +29,27 @@ class DataBaseController():
         title = str(movieJson["title"]).replace("'", " ")
         voteAverage = str(movieJson["vote_average"])
         voteCount = str(movieJson["vote_count"])
-        #releaseDate = str(movieJson["release_date"])
         budget = str(movieJson["budget"])
         revenue = str(movieJson["revenue"])
         runtime = str(movieJson["runtime"])
-        if (movieJson["belongs_to_collection"] != None):
+        # print(movieJson)
+        if (movieJson["belongs_to_collection"] != "null"):
             collectionId = str(movieJson["belongs_to_collection"]["id"])
             self.mainController.getCollection(collectionId)
             # É necessário criar a coleção antes, já que se trata de uma fk, então o sleep
             time.sleep(3)
         else:
             collectionId = "null"
-        # Monta a query sql
-        # sql = "insert into movies " + \
-        #     "values (" + movieId + ", '" + originalLanguage + "', '" + originalTitle + "', " + popularity + ", '" + \
-        #     status + "', '" + title + "', " + voteAverage + ", " + voteCount + ", to_date('" + \
-        #     releaseDate + "', 'yyyy-mm-dd'), " + budget + ", " + revenue + ", " + runtime + ", " + collectionId + ")"
 
+        # Monta a query sql
         sql = "insert into movies " + \
               "values (" + movieId + ", '" + originalLanguage + "', '" + originalTitle + "', " + popularity + ", '" + \
               status + "', '" + title + "', " + voteAverage + ", " + voteCount + ", "
 
-        if (movieJson["release_date"] != None):
-            releaseDate = str(movieJson["release_date"])
+        releaseDate = str(movieJson["release_date"])
+        if (releaseDate != "null"):
             sql += "to_date('" + releaseDate + "', 'yyyy-mm-dd'), " + budget + ", " + revenue + ", " + runtime + ", " + collectionId + ")"
         else:
-            releaseDate = "null"
             sql += releaseDate + ", " + budget + ", " + revenue + ", " + runtime + ", " + collectionId + ")"
         # Executa a query sql no banco
         try:
@@ -175,6 +170,31 @@ class DataBaseController():
             self.connection.rollback()
             pass
 
+    # Salva no postgresql um crédito específico
+    def saveCredit(self, creditJson, personId, creditId):
+        self.mainController.getPerson(personId)
+        time.sleep(3)
+        creditType = str(creditJson["credit_type"]).replace("'", "''")
+        creditDepartment = str(creditJson["department"]).replace("'", "''")
+        creditJob = str(creditJson["job"]).replace("'", "''")
+        if(creditType != "crew"):
+            creditCharacter = str(creditJson["media"]["character"]).replace("'", "''")
+        else:
+            creditCharacter = "null"
+        movieId = str(creditJson["id"])
+
+        # Monta a query sql
+        sql = "insert into credits values (" + str(creditId) + ", '" + creditType + "', '" + creditDepartment + "', '" + creditJob + \
+            "', '" + creditCharacter + "', " + movieId + ", " + str(personId) + ")"
+        # Executa a query sql no banco
+        try:
+            self.cursor.execute(sql)
+            self.connection.commit()
+            print("\nCrédito " + creditId + " salvo com sucesso!")
+        except:
+            self.connection.rollback()
+            pass
+
     # Salva no postgresql uma pessoa específica
     def savePerson(self, personJson):
         personId = str(personJson["id"])
@@ -187,23 +207,21 @@ class DataBaseController():
         sql = "insert into people " + \
               "values (" + personId + ", '" + name + "', " + gender + ", " + popularity + ", '" + \
               place_of_birth + "', "
-        if (personJson["birthday"] != None):
-            birthday = str(personJson["birthday"])
+        birthday = str(personJson["birthday"])
+        if (birthday != "null"):
             sql += "to_date('" + birthday + "', 'yyyy-mm-dd'), "
         else:
-            birthday = "null"
             sql += birthday + ", "
-        if (personJson["deathday"] != None):
-            deathday = str(personJson["deathday"])
+        deathday = str(personJson["deathday"])
+        if (deathday != "null"):
             sql += "to_date('" + deathday + "', 'yyyy-mm-dd'), '" + known_for_department + "')"
         else:
-            deathday = "null"
             sql += deathday + ", '" + known_for_department + "')"
         # Executa a query sql no banco
         try:
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nPessoa: " + name + " salvo com sucesso!")
+            print("\nPessoa: " + name + " salva com sucesso!")
         except:
             self.connection.rollback()
             pass
