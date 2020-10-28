@@ -127,7 +127,8 @@ class ApiController():
 
     # Busca os filmes que estão no trending
     def getTrendingMovies(self):
-        # Percorre as 10 primeiras páginas dos trendings
+        aux = 1
+        # Percorre as 10 primeiras páginas dos trendingss
         for page in range(1, 11):
             # Monta a url da request que será feita
             requestUrl = "https://api.themoviedb.org/3/trending/movie/day?api_key=" + self.apiKey + "&page=" + str(page)
@@ -138,7 +139,6 @@ class ApiController():
             # Checa se a request deu certo
             results = self.verifyRequest(response, results)
             if(results != False):
-                aux = 1
                 # Percorre cada filme do trending e salva no banco
                 for movie in results:
                     self.getMovie(movie["id"])
@@ -147,6 +147,7 @@ class ApiController():
             
     # Busca as pessoas que estão no trending
     def getTrendingPeople(self):
+        aux = 1
         # Percorre as 10 primeiras páginas dos trendings
         for page in range(1, 11):
             # Monta a url da request que será feita
@@ -159,7 +160,6 @@ class ApiController():
             # Checa se a request deu certo
             results = self.verifyRequest(response, results)
             if (results != False):
-                aux = 1
                 # Percorre cada pessoa do trending e salva no banco
                 for person in results:
                     self.getPerson(person["id"])
