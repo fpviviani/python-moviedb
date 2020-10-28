@@ -60,7 +60,7 @@ CREATE TABLE movie_production_companies (
 	id_production_company BIGINT,
 	PRIMARY KEY(id_movie, id_production_company),
 		FOREIGN KEY(id_movie) REFERENCES movies(id),
-		FOREIGN KEY(id_production_companie) REFERENCES production_companies(id)
+		FOREIGN KEY(id_production_company) REFERENCES production_companies(id)
 );
 
 CREATE TABLE movie_production_countries (
