@@ -137,11 +137,14 @@ class ApiController():
             results = json.loads(response.content)["results"]
             # Checa se a request deu certo
             results = self.verifyRequest(response, results)
-            if (results != False):
+            if(results != False):
+                aux = 1
                 # Percorre cada filme do trending e salva no banco
                 for movie in results:
                     self.getMovie(movie["id"])
-
+                    self.mainController.populateTrendingMovie(aux, movie["id"])
+                    aux = aux + 1
+            
     # Busca as pessoas que estão no trending
     def getTrendingPeople(self):
         # Percorre as 10 primeiras páginas dos trendings
@@ -156,9 +159,12 @@ class ApiController():
             # Checa se a request deu certo
             results = self.verifyRequest(response, results)
             if (results != False):
+                aux = 1
                 # Percorre cada pessoa do trending e salva no banco
                 for person in results:
                     self.getPerson(person["id"])
+                    self.mainController.populateTrendingPerson(aux, person["id"])
+                    aux = aux + 1
 
     # Verifica se a request foi bem sucedida
     def verifyRequest(self, response, results):
