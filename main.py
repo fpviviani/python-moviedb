@@ -10,7 +10,7 @@ class MainController():
         # Chama a função que armazena os generos de filme no banco
         # self.api.getGenres()
         # Chama a função que armazena os filmes no banco (a partir de filmes os outros objetos são armazenados)
-        # self.api.getTrendingMovies()
+        self.api.getTrendingMovies()
         # Chama a função que armazena as pessoas no banco
         # self.api.getTrendingPeople()
 
@@ -56,7 +56,7 @@ class MainController():
     def populatePerson(self, personJson):
         self.db.savePerson(personJson)
 
-    # Encerra a conexão com o banco após o uso
+    # Encerra a conexão com o banco após o uso.
     def closeConnection(self):
         self.db.closeConnection()
 
