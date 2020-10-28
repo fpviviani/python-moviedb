@@ -8,7 +8,7 @@ class DataBaseController():
         self.mainController = mainController
         # Instancia variáveis da db
         self.dbHost = "localhost"
-        self.dbName = "moviedb2"
+        self.dbName = "moviedb"
         self.dbUser = "postgres"
         self.dbPassword = "postgres"
 
@@ -100,7 +100,7 @@ class DataBaseController():
             pass
 
     # Salva no postgresql um trending específico
-    def saveTrendingMovie(self, position, id):
+    def saveTrendingMovie(self, position, id, json):
         try:
             # Monta a query sql
             sql = "insert into trending_movies values (" + str(position) + ",'" + datetime.today().strftime('%Y-%m-%d') + \
@@ -122,14 +122,57 @@ class DataBaseController():
             except:
                 self.connection.rollback()
                 pass
+        try:
+            # Monta o JSON
+            data = str(datetime.today().strftime('%Y-%m-%d'))
+            trend = {
+                "_id": position,
+                "movie": {
+                    "id": id,
+                    "title": json["title"],
+                    "release_date": json["release_date"],
+                    "original_language": json["original_language"],
+                    "original_title": json["original_title"],
+                    "genre_ids": json["genre_ids"],
+                    "popularity": json["popularity"]
+                },
+                "trend_date": data
+            }
+            # Faz a inserção do JSON no mongo
+            self.mongo.trending_movies.insert_one(trend)
+        except:
+            try:
+                # Monta o JSON
+                data = str(datetime.today().strftime('%Y-%m-%d'))
+                trend = {
+                    "_id": position,
+                    "movie": {
+                        "id": id,
+                        "title": json["title"],
+                        "release_date": json["release_date"],
+                        "original_language": json["original_language"],
+                        "original_title": json["original_title"],
+                        "genre_ids": json["genre_ids"],
+                        "popularity": json["popularity"]
+                    },
+                    "trend_date": data
+                }
+                # Faz a inserção do JSON no mongo
+                myquery = {"_id": position}
+                newvalues = {"$set": {"person": {"id": id, "title": json["title"], "release_date": json["release_date"],
+                            "original_language": json["original_language"], "original_title": json["original_title"],
+                            "genre_ids": json["genre_ids"], "popularity": json["popularity"]}, "trend_date": data}}
+                self.mongo.trending_movies.update_one(myquery, newvalues)
+            except:
+                pass
 
     # Salva no postgresql um trending específico
-    def saveTrendingPerson(self, position, id):
+    def saveTrendingPerson(self, position, id, json):
         try:
             # Monta a query sql
             sql = "insert into trending_people values (" + str(position) + ",'" + datetime.today().strftime('%Y-%m-%d') \
                   + "'," + str(id) +")"
-        # Executa a query sql no banco
+            # Executa a query sql no banco
             self.cursor.execute(sql)
             self.connection.commit()
             print("\nTrending " + str(position) + " salvo com sucesso!")
@@ -145,6 +188,42 @@ class DataBaseController():
                 print("\nTrending " + str(position) + " atualizado com sucesso!")
             except:
                 self.connection.rollback()
+                pass
+        try:
+            # Monta o JSON
+            data = str(datetime.today().strftime('%Y-%m-%d'))
+            trend = {
+                "_id": position,
+                "person": {
+                    "id": id,
+                    "name": json["name"],
+                    "known_for_department": json["known_for_department"],
+                    "popularity": json["popularity"]
+                },
+                "trend_date": data
+            }
+            # Faz a inserção do JSON no mongo
+            self.mongo.trending_people.insert_one(trend)
+        except:
+            try:
+                # Monta o JSON
+                data = str(datetime.today().strftime('%Y-%m-%d'))
+                trend = {
+                    "_id": position,
+                    "person": {
+                        "id": id,
+                        "name": json["name"],
+                        "known_for_department": json["known_for_department"],
+                        "popularity": json["popularity"]
+                    },
+                    "trend_date": data
+                }
+                # Faz a inserção do JSON no mongo
+                myquery = {"_id": position}
+                newvalues = {"$set": {"person": {"id": id, "name": json["name"], "known_for_department": json["known_for_department"],
+                                                  "popularity": json["popularity"]}, "trend_date": data}}
+                self.mongo.trending_people.update_one(myquery, newvalues)
+            except:
                 pass
 
     # Salva todos os gêneros de um filme no postgresql
@@ -259,6 +338,29 @@ class DataBaseController():
                 self.mainController.getMovie(part["id"])
         except:
             self.connection.rollback()
+            pass
+        colecao = []
+        for i in collectionJson["parts"]:
+            aux = {
+                "id": i["id"],
+                "title": i["title"],
+                "release_date": i["release_date"],
+                "original_language": i["original_language"],
+                "original_title": i["original_title"],
+                "genre_ids": i["genre_ids"],
+                "popularity": i["popularity"]
+            }
+            colecao.append(aux)
+        # Monta o JSON
+        collection = {
+            "_id": collectionJson["id"],
+            "name": collectionName,
+            "parts": colecao
+        }
+        try:
+            # Faz a inserção do JSON no mongo
+            self.mongo.collections.insert_one(collection)
+        except:
             pass
 
     # Salva no postgresql um crédito específico
