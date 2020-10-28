@@ -159,7 +159,7 @@ class DataBaseController():
                 }
                 # Faz a inserção do JSON no mongo
                 myquery = {"_id": position}
-                newvalues = {"$set": {"person": {"id": id, "title": json["title"], "release_date": json["release_date"],
+                newvalues = {"$set": {"movie": {"id": id, "title": json["title"], "release_date": json["release_date"],
                             "original_language": json["original_language"], "original_title": json["original_title"],
                             "genre_ids": json["genre_ids"], "popularity": json["popularity"]}, "trend_date": data}}
                 self.mongo.trending_movies.update_one(myquery, newvalues)
@@ -341,10 +341,14 @@ class DataBaseController():
             pass
         colecao = []
         for i in collectionJson["parts"]:
+            if (i.get("release_date")):
+                release = i["release_date"]
+            else:
+                release = None
             aux = {
                 "id": i["id"],
                 "title": i["title"],
-                "release_date": i["release_date"],
+                "release_date": release,
                 "original_language": i["original_language"],
                 "original_title": i["original_title"],
                 "genre_ids": i["genre_ids"],
