@@ -1,14 +1,15 @@
 import psycopg2
 import time
+from datetime import datetime
 
 class DataBaseController(): 
     def __init__(self, mainController):  
         self.mainController = mainController
         # Instancia variáveis da db
         self.dbHost = "localhost"
-        self.dbName = "moviedb3"
+        self.dbName = "moviedb2"
         self.dbUser = "postgres"
-        self.dbPassword = "123456"
+        self.dbPassword = "postgres"
 
     # Inicia a conexão com o postgresql
     def startConnection(self):
@@ -70,20 +71,22 @@ class DataBaseController():
     def saveTrendingMovie(self, position, id):
         try:
             # Monta a query sql
-            sql = "insert into trending_movie values (" + str(position) + str(id) +")"
-        # Executa a query sql no banco
+            sql = "insert into trending_movies values (" + str(position) + ",'" + datetime.today().strftime('%Y-%m-%d') + \
+                  "'," + str(id) +")"
+            # Executa a query sql no banco
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\Trending " + position + " salvo com sucesso!")
+            print("\nTrending " + str(position) + " salvo com sucesso!")
         except:
             self.connection.rollback()
             # Monta a query sql
-            sql = "update trending_movie set movie_id = " + str(id) +" where id = "+ position 
+            sql = "update trending_movies set id_movie = " + str(id) +", trend_date = '" + datetime.today().strftime('%Y-%m-%d') \
+                  + "' where trend_id = "+ str(position)
             try:
                 # Executa a query sql no banco
                 self.cursor.execute(sql)
                 self.connection.commit()
-                print("\Trending " + position + " atualizado com sucesso!")
+                print("\nTrending " + str(position) + " atualizado com sucesso!")
             except:
                 self.connection.rollback()
                 pass
@@ -92,20 +95,22 @@ class DataBaseController():
     def saveTrendingPerson(self, position, id):
         try:
             # Monta a query sql
-            sql = "insert into trending_person values (" + str(position) + str(id) +")"
+            sql = "insert into trending_people values (" + str(position) + ",'" + datetime.today().strftime('%Y-%m-%d') \
+                  + "'," + str(id) +")"
         # Executa a query sql no banco
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\Trending " + position + " salvo com sucesso!")
+            print("\nTrending " + str(position) + " salvo com sucesso!")
         except:
             self.connection.rollback()
             # Monta a query sql
-            sql = "update trending_person set person_id = " + str(id) +" where id = "+ position 
+            sql = "update trending_people set id_people = " + str(id) + ", trend_date = '" + datetime.today().strftime('%Y-%m-%d') \
+                  + "' where trend_id = "+ str(position)
             try:
                 # Executa a query sql no banco
                 self.cursor.execute(sql)
                 self.connection.commit()
-                print("\Trending " + position + " atualizado com sucesso!")
+                print("\nTrending " + str(position) + " atualizado com sucesso!")
             except:
                 self.connection.rollback()
                 pass
