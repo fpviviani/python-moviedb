@@ -1,14 +1,20 @@
 import psycopg2
 import time
+from pymongo import MongoClient
 
-class DataBaseController(): 
-    def __init__(self, mainController):  
+class DataBaseController():
+    def __init__(self, mainController):
         self.mainController = mainController
-        # Instancia variáveis da db
+        # Instancia variáveis da db (PostgreSQL)
         self.dbHost = "localhost"
-        self.dbName = "moviedb3"
+        self.dbName = "moviedb2"
         self.dbUser = "postgres"
-        self.dbPassword = "123456"
+        self.dbPassword = "postgres"
+
+        # Instancia variáveis da db (MongoDB)
+        self.client = MongoClient("localhost", 27017)
+        self.mongo = self.client.moviedb
+        #self.col = self.mongo.genres
 
     # Inicia a conexão com o postgresql
     def startConnection(self):
@@ -35,11 +41,13 @@ class DataBaseController():
         # print(movieJson)
         if (movieJson["belongs_to_collection"] != "null"):
             collectionId = str(movieJson["belongs_to_collection"]["id"])
+            collectionId2 = str(movieJson["belongs_to_collection"]["id"])
             self.mainController.getCollection(collectionId)
             # É necessário criar a coleção antes, já que se trata de uma fk, então o sleep
             time.sleep(3)
         else:
             collectionId = "null"
+            collectionId2 = None
 
         # Monta a query sql
         sql = "insert into movies " + \
@@ -51,6 +59,7 @@ class DataBaseController():
             sql += "to_date('" + releaseDate + "', 'yyyy-mm-dd'), " + budget + ", " + revenue + ", " + runtime + ", " + collectionId + ")"
         else:
             sql += releaseDate + ", " + budget + ", " + revenue + ", " + runtime + ", " + collectionId + ")"
+            releaseDate = None
         # Executa a query sql no banco
         try:
             self.cursor.execute(sql)
@@ -64,6 +73,30 @@ class DataBaseController():
             self.mainController.pupulateProductionCountries(movieId, movieJson["production_countries"])
         except:
             self.connection.rollback()
+            pass
+        # Monta o JSON
+        movie = {
+            "_id": movieJson["id"],
+            "belongs_to_collection": collectionId2,
+            "original_language": movieJson["original_language"],
+            "original_title": movieJson["original_title"],
+            "title": movieJson["title"],
+            "popularity": movieJson["popularity"],
+            "status": movieJson["status"],
+            "vote_average": movieJson["vote_average"],
+            "vote_count": movieJson["vote_count"],
+            "genres": movieJson["genres"],
+            "release_date": releaseDate,
+            "budget": movieJson["budget"],
+            "revenue": movieJson["revenue"],
+            "runtime": movieJson["runtime"],
+            "production_companies": movieJson["production_companies"],
+            "production_countries": movieJson["production_countries"]
+        }
+        try:
+            # Faz a inserção do JSON no mongo
+            self.mongo.movies.insert_one(movie)
+        except:
             pass
 
     # Salva todos os gêneros de um filme no postgresql
@@ -88,12 +121,22 @@ class DataBaseController():
             genreName = str(genre["name"]).replace("'", " ")
             # Monta a query sql
             sql = "insert into genres values (" + genreId + ", '" + genreName + "')"
+            # Monta o JSON
+            genre = {
+                "_id": genre["id"],
+                "name": genreName
+            }
             try:
-                # Executa a query sql no banco
+                # Executa a query sql no postgres
                 self.cursor.execute(sql)
                 self.connection.commit()
             except:
                 self.connection.rollback()
+                pass
+            try:
+                # Faz a inserção do JSON no mongo
+                self.mongo.genres.insert_one(genre)
+            except:
                 pass
         print("\nGêneros salvos com sucesso!")
 
@@ -173,26 +216,63 @@ class DataBaseController():
     # Salva no postgresql um crédito específico
     def saveCredit(self, creditJson, personId, creditId):
         self.mainController.getPerson(personId)
-        time.sleep(3)
+        time.sleep(1)
         creditType = str(creditJson["credit_type"]).replace("'", "''")
         creditDepartment = str(creditJson["department"]).replace("'", "''")
         creditJob = str(creditJson["job"]).replace("'", "''")
         if(creditType != "crew"):
             creditCharacter = str(creditJson["media"]["character"]).replace("'", "''")
+            creditCharacter2 = str(creditJson["media"]["character"]).replace("'", "''")
         else:
             creditCharacter = "null"
-        movieId = str(creditJson["id"])
+            creditCharacter2 = None
+        movieId = str(creditJson["media"]["id"])
 
         # Monta a query sql
-        sql = "insert into credits values (" + str(creditId) + ", '" + creditType + "', '" + creditDepartment + "', '" + creditJob + \
+        sql = "insert into credits values ('" + str(creditId) + "', '" + creditType + "', '" + creditDepartment + "', '" + creditJob + \
             "', '" + creditCharacter + "', " + movieId + ", " + str(personId) + ")"
+        # Monta o JSON
+        if(creditJson["person"].get("popularity")):
+            popularity = creditJson["person"]["popularity"]
+        else:
+            popularity = None
+        credit = {
+            "_id": creditId,
+            "credit_type": creditType,
+            "department": creditDepartment,
+            "job": creditJob,
+            "media": {
+                "id": creditJson["media"]["id"],
+                "vote_count": creditJson["media"]["vote_count"],
+                "vote_average": creditJson["media"]["vote_average"],
+                "title": creditJson["media"]["title"],
+                "release_date": creditJson["media"]["release_date"],
+                "original_language": creditJson["media"]["original_language"],
+                "original_title": creditJson["media"]["original_title"],
+                "genre_ids": creditJson["media"]["genre_ids"],
+                "popularity": creditJson["media"]["popularity"],
+                "character": creditCharacter2
+            },
+            "person": {
+                "id": personId,
+                "name": creditJson["person"]["name"],
+                "gender": creditJson["person"]["gender"],
+                "known_for_department": creditJson["person"]["known_for_department"],
+                "popularity": popularity
+            }
+        }
         # Executa a query sql no banco
         try:
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nCrédito " + creditId + " salvo com sucesso!")
+            print("\nCrédito " + str(creditId) + " salvo com sucesso!")
         except:
             self.connection.rollback()
+            pass
+        try:
+            # Faz a inserção do JSON no mongo
+            self.mongo.credits.insert_one(credit)
+        except:
             pass
 
     # Salva no postgresql uma pessoa específica
@@ -212,11 +292,24 @@ class DataBaseController():
             sql += "to_date('" + birthday + "', 'yyyy-mm-dd'), "
         else:
             sql += birthday + ", "
+            birthday = None
         deathday = str(personJson["deathday"])
         if (deathday != "null"):
             sql += "to_date('" + deathday + "', 'yyyy-mm-dd'), '" + known_for_department + "')"
         else:
             sql += deathday + ", '" + known_for_department + "')"
+            deathday = None
+        # Monta o JSON
+        person = {
+            "_id": personJson["id"],
+            "name": name,
+            "gender": personJson["gender"],
+            "popularity": personJson["popularity"],
+            "place_of_birth": place_of_birth,
+            "birthday": birthday,
+            "deathday": deathday,
+            "known_for_department": known_for_department
+        }
         # Executa a query sql no banco
         try:
             self.cursor.execute(sql)
@@ -224,4 +317,9 @@ class DataBaseController():
             print("\nPessoa: " + name + " salva com sucesso!")
         except:
             self.connection.rollback()
+            pass
+        try:
+            # Faz a inserção do JSON no mongo
+            self.mongo.people.insert_one(person)
+        except:
             pass

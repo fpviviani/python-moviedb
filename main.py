@@ -7,15 +7,17 @@ class MainController():
         self.api = API.ApiController(self)
         self.db = DB.DataBaseController(self)
         self.db.startConnection()
+        # Chama a função que armazena os generos de filme no banco
         self.api.getGenres()
+        # Chama a função que armazena os filmes no banco (a partir de filmes os outros objetos são armazenados)
         self.api.getTrendingMovies()
-        self.api.getTrendingPeople()
+        # self.api.getTrendingPeople()
 
-    # Salva no postgresql um filme específico
+    # Salva no banco um filme específico
     def populateMovie(self, movieJson):
         self.db.saveMovie(movieJson)
 
-    # Salva no postgresql os gêneros de um filme
+    # Salva no banco os gêneros de um filme
     def populateMovieGenres(self, movieId, genresJson):
         self.db.saveMovieGenres(movieId, genresJson)
 
@@ -23,25 +25,25 @@ class MainController():
     def populateGenres(self, genresJson):
         self.db.saveGenres(genresJson)
 
-    # Salva no postgresql as companhias de produção
+    # Salva no banco as companhias de produção
     # e salva os produtores de um filme específico
     def pupulateProductionCompanies(self, movieId, companiesJson):
         self.db.saveProductionCompanies(movieId, companiesJson)
 
-    # Salva no postgresql os países de produção e gravação
+    # Salva no banco os países de produção e gravação
     # e salva os países de produção e gravação de um filme específico
     def pupulateProductionCountries(self, movieId, countriesJson):
         self.db.saveProductionCountries(movieId, countriesJson)
 
-    # Salva no postgresql uma coleção específica
+    # Salva no banco uma coleção específica
     def populateCollection(self, collectionJson):
         self.db.saveCollection(collectionJson)
 
-    # Salva no postgresql um crédito específico
+    # Salva no banco um crédito específico
     def populateCredit(self, creditJson, personId, creditId):
         self.db.saveCredit(creditJson, personId, creditId)
 
-    # Salva no postgresql uma pessoa específica
+    # Salva no banco uma pessoa específica
     def populatePerson(self, personJson):
         self.db.savePerson(personJson)
 
