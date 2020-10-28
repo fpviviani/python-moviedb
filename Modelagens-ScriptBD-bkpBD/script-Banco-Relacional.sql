@@ -1,7 +1,35 @@
+CREATE TABLE genres (
+	id INTEGER PRIMARY KEY,
+	name VARCHAR(50)
+);
+
 CREATE TABLE collections (
 	id BIGINT PRIMARY KEY,
 	name VARCHAR(150)
 );
+
+CREATE TABLE production_companies (
+	id BIGINT PRIMARY KEY,
+	name VARCHAR(150),
+	origin_country VARCHAR(5)
+);
+
+CREATE TABLE production_countries (
+	iso_3166_1 VARCHAR(5) PRIMARY KEY,
+	name VARCHAR(50)
+);
+
+CREATE TABLE people (
+	id BIGINT PRIMARY KEY,
+	name VARCHAR(150),
+	gender INTEGER,
+	popularity FLOAT,
+	place_of_birth VARCHAR(150),
+	birthday DATE,
+	deathday DATE, 
+	know_for_department VARCHAR(50)
+);
+
 
 CREATE TABLE movies (
 	id BIGINT PRIMARY KEY,
@@ -23,27 +51,8 @@ CREATE TABLE movies (
 CREATE TABLE trending_movies (
 	trend_id INTEGER PRIMARY KEY,
 	trend_date DATE,
-	id_movie BIGINT, 
+	id_movie BIGINT UNIQUE, 
 		FOREIGN KEY (id_movie) REFERENCES movies(id)
-);
-
-CREATE TABLE genres (
-	id INTEGER PRIMARY KEY,
-	name VARCHAR(50)
-);
-
-CREATE TABLE movie_genres (
-	id_movie BIGINT, 
-	id_genre INTEGER,
-	PRIMARY KEY(id_movie, id_genre),
-		FOREIGN KEY (id_movie) REFERENCES movies(id),
-		FOREIGN KEY (id_genre) REFERENCES genres(id)
-); 
-
-CREATE TABLE production_companies (
-	id BIGINT PRIMARY KEY,
-	name VARCHAR(150),
-	origin_country VARCHAR(5)
 );
 
 CREATE TABLE movie_production_companies (
@@ -51,32 +60,24 @@ CREATE TABLE movie_production_companies (
 	id_production_company BIGINT,
 	PRIMARY KEY(id_movie, id_production_company),
 		FOREIGN KEY(id_movie) REFERENCES movies(id),
-		FOREIGN KEY(id_production_company) REFERENCES production_companies(id)
-);
-
-CREATE TABLE production_countries (
-	iso_3166_1 VARCHAR(5) PRIMARY KEY,
-	name VARCHAR(50)
+		FOREIGN KEY(id_production_companie) REFERENCES production_companies(id)
 );
 
 CREATE TABLE movie_production_countries (
 	id_movie BIGINT,
-	iso_3166_1 VARCHAR(5),
+	iso_3166_1 VARCHAR(5) NOT NULL,
 	PRIMARY KEY (id_movie, iso_3166_1),
 		FOREIGN KEY (id_movie) REFERENCES movies(id),
 		FOREIGN KEY (iso_3166_1) REFERENCES production_countries(iso_3166_1)	
 );
 
-CREATE TABLE people (
-	id BIGINT PRIMARY KEY,
-	name VARCHAR(150),
-	gender INTEGER,
-	popularity FLOAT,
-	place_of_birth VARCHAR(150),
-	birthday DATE,
-	deathday DATE, 
-	know_for_department VARCHAR(50)
-);
+CREATE TABLE movie_genres (
+	id_movie BIGINT, 
+	id_genre INTEGER NOT NULL,
+	PRIMARY KEY(id_movie, id_genre),
+		FOREIGN KEY (id_movie) REFERENCES movies(id),
+		FOREIGN KEY (id_genre) REFERENCES genres(id)
+); 
 
 CREATE TABLE credits (
 	credit_id VARCHAR(30) PRIMARY KEY,
@@ -93,6 +94,6 @@ CREATE TABLE credits (
 CREATE TABLE trending_people (
 	trend_id INTEGER PRIMARY KEY,
 	trend_date DATE,
-	id_people BIGINT,
+	id_people BIGINT UNIQUE,
 		FOREIGN KEY (id_people) REFERENCES people(id)
 );
