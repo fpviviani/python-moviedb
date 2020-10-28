@@ -10,16 +10,20 @@ class MainController():
         # Chama a função que armazena os generos de filme no banco
         self.api.getGenres()
         # Chama a função que armazena os filmes no banco (a partir de filmes os outros objetos são armazenados)
-        self.api.getTrendingMovies()
-        # self.api.getTrendingPeople()
+        #self.api.getTrendingMovies()
+        self.api.getTrendingPeople()
 
     # Salva no banco um filme específico
     def populateMovie(self, movieJson):
         self.db.saveMovie(movieJson)
 
-    # Salva no postgresql um filme específico e sua posição no trending
+    # Salva no banco um filme específico e sua posição no trending
     def populateTrendingMovie(self, position, id):
         self.db.saveTrendingMovie(position, id)
+
+    # Salva no banco uma pessoa específico e sua posição no trending
+    def populateTrendingPerson(self, position, id):
+        self.db.saveTrendingPerson(position, id)
 
     # Salva no banco os gêneros de um filme
     def populateMovieGenres(self, movieId, genresJson):
