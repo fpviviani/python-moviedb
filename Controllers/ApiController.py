@@ -128,7 +128,7 @@ class ApiController():
     # Busca os filmes que estão no trending
     def getTrendingMovies(self):
         aux = 1
-        # Percorre as 10 primeiras páginas dos trendings
+        # Percorre as 10 primeiras páginas dos trendingss
         for page in range(1, 11):
             # Monta a url da request que será feita
             requestUrl = "https://api.themoviedb.org/3/trending/movie/day?api_key=" + self.apiKey + "&page=" + str(page)
