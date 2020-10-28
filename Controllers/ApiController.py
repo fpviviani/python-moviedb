@@ -142,7 +142,7 @@ class ApiController():
                 # Percorre cada filme do trending e salva no banco
                 for movie in results:
                     self.getMovie(movie["id"])
-                    self.mainController.populateTrendingMovie(aux, movie["id"])
+                    self.mainController.populateTrendingMovie(aux, movie["id"], movie)
                     aux = aux + 1
             
     # Busca as pessoas que estão no trending
@@ -163,7 +163,7 @@ class ApiController():
                 # Percorre cada pessoa do trending e salva no banco
                 for person in results:
                     self.getPerson(person["id"])
-                    self.mainController.populateTrendingPerson(aux, person["id"])
+                    self.mainController.populateTrendingPerson(aux, person["id"], person)
                     aux = aux + 1
 
     # Verifica se a request foi bem sucedida
