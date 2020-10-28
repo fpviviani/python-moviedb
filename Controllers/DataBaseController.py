@@ -6,7 +6,7 @@ from pymongo import MongoClient
 class DataBaseController(): 
     def __init__(self, mainController):  
         self.mainController = mainController
-        # Instancia variáveis da db
+        # Instancia variáveis da db (Postgresql)
         self.dbHost = "localhost"
         self.dbName = "moviedb"
         self.dbUser = "postgres"
@@ -16,16 +16,16 @@ class DataBaseController():
         self.client = MongoClient("localhost", 27017)
         self.mongo = self.client.moviedb
 
-    # Inicia a conexão com o postgresql
+    # Inicia a conexão com o banco
     def startConnection(self):
         self.connection = psycopg2.connect(host=self.dbHost, database=self.dbName, user=self.dbUser, password=self.dbPassword)
         self.cursor = self.connection.cursor()
 
-    # Encerra a conexão com o postgresql
+    # Encerra a conexão com o banco
     def closeConnection(self):
         self.connection = self.connection.close()
 
-    # Salva no postgresql um filme específico
+    # Salva no banco um filme específico
     def saveMovie(self, movieJson):
         movieId = str(movieJson["id"])
         originalTitle = str(movieJson["original_title"]).replace("'", " ")
@@ -99,7 +99,7 @@ class DataBaseController():
         except:
             pass
 
-    # Salva no postgresql um trending específico
+    # Salva no banco um trending específico
     def saveTrendingMovie(self, position, id, json):
         try:
             # Monta a query sql
@@ -166,7 +166,7 @@ class DataBaseController():
             except:
                 pass
 
-    # Salva no postgresql um trending específico
+    # Salva no banco um trending específico
     def saveTrendingPerson(self, position, id, json):
         try:
             # Monta a query sql
@@ -226,7 +226,7 @@ class DataBaseController():
             except:
                 pass
 
-    # Salva todos os gêneros de um filme no postgresql
+    # Salva todos os gêneros de um filme no banco
     def saveMovieGenres(self, movieId, genresJson):
         for genre in genresJson:
             genreId = str(genre["id"])
@@ -241,7 +241,7 @@ class DataBaseController():
                 pass
         print("\nGênero(s) do filme salvo(s) com sucesso!")
 
-    # Salva todos os gêneros no postgresql
+    # Salva todos os gêneros no banco
     def saveGenres(self, genresJson):
         for genre in genresJson:
             genreId = str(genre["id"])
@@ -267,7 +267,7 @@ class DataBaseController():
                 pass
         print("\nGêneros salvos com sucesso!")
 
-    # Salva no postgresql as companhias de produção
+    # Salva no banco as companhias de produção
     def saveProductionCompanies(self, movieId, companiesJson):
         for company in companiesJson:
             companyId = str(company["id"])
@@ -295,7 +295,7 @@ class DataBaseController():
                 pass
         print("\nCompanhia(s) de Produção do filme salva(s) com sucesso!")
 
-    # Salva no postgresql os países de produção do filme
+    # Salva no banco os países de produção do filme
     def saveProductionCountries(self, movieId, countriesJson):
         for country in countriesJson:
             countryId = str(country["iso_3166_1"])
@@ -322,7 +322,7 @@ class DataBaseController():
                 pass
         print("\nPaís(es) de Produção do filme salvo(s) com sucesso!")
 
-    # Salva no postgresql uma coleção específica
+    # Salva no banco uma coleção específica
     def saveCollection(self, collectionJson):
         collectionId = str(collectionJson["id"])
         collectionName = str(collectionJson["name"]).replace("'", "''")
@@ -363,7 +363,7 @@ class DataBaseController():
         except:
             pass
 
-    # Salva no postgresql um crédito específico
+    # Salva no banco um crédito específico
     def saveCredit(self, creditJson, personId, creditId):
         self.mainController.getPerson(personId)
         time.sleep(1)
@@ -426,7 +426,7 @@ class DataBaseController():
         except:
             pass
 
-    # Salva no postgresql uma pessoa específica
+    # Salva no banco uma pessoa específica
     def savePerson(self, personJson):
         personId = str(personJson["id"])
         name = str(personJson["name"]).replace("'", " ")

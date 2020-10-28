@@ -27,7 +27,7 @@ class ApiController():
         # Pega o conteudo da resposta
         response = requests.get(requestUrl)
         # Separa os dados do filme
-        results = json.loads(response.content)
+        results = json.loads(responsecontent)
         # Checa se a request deu certo
         results = self.verifyRequest(response, results)
         if (results != False):
