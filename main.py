@@ -8,10 +8,11 @@ class MainController():
         self.db = DB.DataBaseController(self)
         self.db.startConnection()
         # Chama a função que armazena os generos de filme no banco
-        self.api.getGenres()
+        # self.api.getGenres()
         # Chama a função que armazena os filmes no banco (a partir de filmes os outros objetos são armazenados)
-        self.api.getTrendingMovies()
-        #self.api.getTrendingPeople()
+        # self.api.getTrendingMovies()
+        # Chama a função que armazena as pessoas no banco
+        # self.api.getTrendingPeople()
 
     # Salva no banco um filme específico
     def populateMovie(self, movieJson):
