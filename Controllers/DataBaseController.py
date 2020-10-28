@@ -66,6 +66,50 @@ class DataBaseController():
             self.connection.rollback()
             pass
 
+    # Salva no postgresql um trending específico
+    def saveTrendingMovie(self, position, id):
+        try:
+            # Monta a query sql
+            sql = "insert into trending_movie values (" + str(position) + str(id) +")"
+        # Executa a query sql no banco
+            self.cursor.execute(sql)
+            self.connection.commit()
+            print("\Trending " + position + " salvo com sucesso!")
+        except:
+            self.connection.rollback()
+            # Monta a query sql
+            sql = "update trending_movie set movie_id = " + str(id) +" where id = "+ position 
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql)
+                self.connection.commit()
+                print("\Trending " + position + " atualizado com sucesso!")
+            except:
+                self.connection.rollback()
+                pass
+
+    # Salva no postgresql um trending específico
+    def saveTrendingPerson(self, position, id):
+        try:
+            # Monta a query sql
+            sql = "insert into trending_person values (" + str(position) + str(id) +")"
+        # Executa a query sql no banco
+            self.cursor.execute(sql)
+            self.connection.commit()
+            print("\Trending " + position + " salvo com sucesso!")
+        except:
+            self.connection.rollback()
+            # Monta a query sql
+            sql = "update trending_person set person_id = " + str(id) +" where id = "+ position 
+            try:
+                # Executa a query sql no banco
+                self.cursor.execute(sql)
+                self.connection.commit()
+                print("\Trending " + position + " atualizado com sucesso!")
+            except:
+                self.connection.rollback()
+                pass
+
     # Salva todos os gêneros de um filme no postgresql
     def saveMovieGenres(self, movieId, genresJson):
         for genre in genresJson:
