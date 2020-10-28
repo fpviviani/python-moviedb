@@ -15,6 +15,10 @@ class MainController():
     def populateMovie(self, movieJson):
         self.db.saveMovie(movieJson)
 
+    # Salva no postgresql um filme específico e sua posição no trending
+    def populateTrendingMovie(self, position, id):
+        self.db.saveTrendingMovie(position, id)
+
     # Salva no postgresql os gêneros de um filme
     def populateMovieGenres(self, movieId, genresJson):
         self.db.saveMovieGenres(movieId, genresJson)

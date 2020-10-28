@@ -133,9 +133,13 @@ class ApiController():
             # Checa se a request deu certo
             results = self.verifyRequest(response, results)
             if(results != False):
+                aux = 1
                 # Percorre cada filme do trending e salva no banco
                 for movie in results:
+                    print(movie)
                     self.getMovie(movie["id"])
+                    self.mainController.populateTrendingMovie(aux, movie["id"])
+                    aux = aux + 1
             
     # Busca as pessoas que estão no trending
     def getTrendingPeople(self):
