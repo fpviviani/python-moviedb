@@ -1,5 +1,6 @@
 
 /Controllers/__pycache__/
-/Resources/__pycache__/
+/Modelagens/__pycache__/
+/Views/__pycache__/
 *.pyc
 *.pyo

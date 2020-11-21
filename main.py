@@ -1,5 +1,7 @@
 from Controllers import DataBaseController as DB
 from Controllers import ApiController as API
+import tkinter as tk
+from Views import MainView as MV
 
 class MainController():         
     def __init__(self):
@@ -8,11 +10,12 @@ class MainController():
         self.db = DB.DataBaseController(self)
         self.db.startConnection()
         # Chama a função que armazena os generos de filme no banco
-        # self.api.getGenres()
-        # Chama a função que armazena os filmes no banco (a partir de filmes os outros objetos são armazenados)
-        self.api.getTrendingMovies()
-        # Chama a função que armazena as pessoas no banco
-        # self.api.getTrendingPeople()
+        self.api.getGenres()
+        # Instancia a view principal
+        self.mainTk = tk.Tk()
+        self.mainTk.resizable(width=False, height=False)
+        self.mv = MV.MainView(self.mainTk, self) 
+        self.mainTk.mainloop()
 
     # Salva no banco um filme específico
     def populateMovie(self, movieJson):
@@ -22,6 +25,10 @@ class MainController():
     def populateTrendingMovie(self, position, id, json):
         self.db.saveTrendingMovie(position, id, json)
 
+    # Busca os filmes que estão no trending
+    def getTrendingMovie(self):
+        self.api.getTrendingMovies()
+
     # Salva no banco uma pessoa específico e sua posição no trending
     def populateTrendingPerson(self, position, id, json):
         self.db.saveTrendingPerson(position, id, json)
@@ -29,6 +36,10 @@ class MainController():
     # Salva no banco os gêneros de um filme
     def populateMovieGenres(self, movieId, genresJson):
         self.db.saveMovieGenres(movieId, genresJson)
+
+    # Busca as pessoas que estão no trending
+    def getTrendingPeople(self):
+        self.api.getTrendingPeople()
 
     # Salva todos os gêneros no postgresql
     def populateGenres(self, genresJson):
@@ -68,9 +79,21 @@ class MainController():
     def getPerson(self, personId):
         self.api.getPerson(personId)
 
+    # Busca todos os dados de uma pessoa específica a partir do seu nome
+    def searchPerson(self, personName):
+        self.api.searchPerson(personName)
+
+    # Busca todos os dados de um filme específico a partir do seu nome
+    def searchMovie(self, movieName):
+        self.api.searchMovie(movieName)
+
     # Busca todos os dados de uma coleção específica a partir do seu id
     def getCollection(self, collectionId):
         self.api.getCollection(collectionId)
+
+    # Exibe uma string de resposta no console da view
+    def outputResponse(self, responseString):
+        self.mv.serverResponse(responseString)
 
 if __name__ == '__main__':
     mainController = MainController()

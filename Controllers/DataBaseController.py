@@ -38,7 +38,6 @@ class DataBaseController():
         budget = str(movieJson["budget"])
         revenue = str(movieJson["revenue"])
         runtime = str(movieJson["runtime"])
-        # print(movieJson)
         if (movieJson["belongs_to_collection"] != "null"):
             collectionId = str(movieJson["belongs_to_collection"]["id"])
             collectionId2 = str(movieJson["belongs_to_collection"]["id"])
@@ -64,7 +63,8 @@ class DataBaseController():
         try:
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nFilme " + title + " salvo com sucesso!")
+            responseString = "Filme " + title + " salvo com sucesso!"
+            self.mainController.outputResponse(responseString)
             # Salva no banco cada gênero do filme
             self.mainController.populateMovieGenres(movieId, movieJson["genres"])
             # Salva no banco cada companhia de produção do filme
@@ -108,7 +108,8 @@ class DataBaseController():
             # Executa a query sql no banco
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nTrending " + str(position) + " salvo com sucesso!")
+            responseString = "Trending " + str(position) + " salvo com sucesso!"
+            self.mainController.outputResponse(responseString)
         except:
             self.connection.rollback()
             # Monta a query sql
@@ -118,7 +119,8 @@ class DataBaseController():
                 # Executa a query sql no banco
                 self.cursor.execute(sql)
                 self.connection.commit()
-                print("\nTrending " + str(position) + " atualizado com sucesso!")
+                responseString = "Trending " + str(position) + " atualizado com sucesso!"
+                self.mainController.outputResponse(responseString)
             except:
                 self.connection.rollback()
                 pass
@@ -175,7 +177,8 @@ class DataBaseController():
             # Executa a query sql no banco
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nTrending " + str(position) + " salvo com sucesso!")
+            responseString = "Trending " + str(position) + " salvo com sucesso!"
+            self.mainController.outputResponse(responseString)
         except:
             self.connection.rollback()
             # Monta a query sql
@@ -185,7 +188,8 @@ class DataBaseController():
                 # Executa a query sql no banco
                 self.cursor.execute(sql)
                 self.connection.commit()
-                print("\nTrending " + str(position) + " atualizado com sucesso!")
+                responseString = "Trending " + str(position) + " atualizado com sucesso!"
+                self.mainController.outputResponse(responseString)
             except:
                 self.connection.rollback()
                 pass
@@ -239,7 +243,8 @@ class DataBaseController():
             except:
                 self.connection.rollback()
                 pass
-        print("\nGênero(s) do filme salvo(s) com sucesso!")
+        responseString = "Gênero(s) do filme salvo(s) com sucesso!"
+        self.mainController.outputResponse(responseString)
 
     # Salva todos os gêneros no banco
     def saveGenres(self, genresJson):
@@ -265,8 +270,9 @@ class DataBaseController():
                 self.mongo.genres.insert_one(genre)
             except:
                 pass
-        print("\nGêneros salvos com sucesso!")
-
+        responseString = "Gêneros salvos com sucesso!"
+        self.mainController.outputResponse(responseString)
+        
     # Salva no banco as companhias de produção
     def saveProductionCompanies(self, movieId, companiesJson):
         for company in companiesJson:
@@ -293,7 +299,8 @@ class DataBaseController():
             except:
                 self.connection.rollback()
                 pass
-        print("\nCompanhia(s) de Produção do filme salva(s) com sucesso!")
+        responseString = "Companhia(s) de Produção do filme salva(s) com sucesso!"
+        self.mainController.outputResponse(responseString)
 
     # Salva no banco os países de produção do filme
     def saveProductionCountries(self, movieId, countriesJson):
@@ -320,7 +327,8 @@ class DataBaseController():
             except:
                 self.connection.rollback()
                 pass
-        print("\nPaís(es) de Produção do filme salvo(s) com sucesso!")
+        responseString = "País(es) de Produção do filme salvo(s) com sucesso!"
+        self.mainController.outputResponse(responseString)
 
     # Salva no banco uma coleção específica
     def saveCollection(self, collectionJson):
@@ -332,7 +340,8 @@ class DataBaseController():
         try:
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nColeção " + collectionName + " salva com sucesso!")
+            responseString = "Coleção " + collectionName + " salva com sucesso!"
+            self.mainController.outputResponse(responseString)
             # Salva no banco cada filme da coleção
             for part in collectionJson["parts"]:
                 self.mainController.getMovie(part["id"])
@@ -420,7 +429,8 @@ class DataBaseController():
         try:
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nCrédito " + str(creditId) + " salvo com sucesso!")
+            responseString = "Crédito " + str(creditId) + " salvo com sucesso!"
+            self.mainController.outputResponse(responseString)
         except:
             self.connection.rollback()
             pass
@@ -469,7 +479,8 @@ class DataBaseController():
         try:
             self.cursor.execute(sql)
             self.connection.commit()
-            print("\nPessoa: " + name + " salva com sucesso!")
+            responseString = "Pessoa: " + name + " salva com sucesso!"
+            self.mainController.outputResponse(responseString)
         except:
             self.connection.rollback()
             pass

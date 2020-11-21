@@ -7,8 +7,8 @@ class ApiController():
         self.apiKey = "619e50c9f8b2c6aacab7bbc2db6c67a7"
 
     # Procura por um filme especifico pelo input do usuário
-    def searchMovie(self):
-        query = str(input('Digite o filme pelo qual deseja pesquisar: '))
+    def searchMovie(self, movieName):
+        query = str(movieName)
         # Monta a url da request que será feita
         requestUrl = "https://api.themoviedb.org/3/search/movie?query=" + query + "&api_key=" + self.apiKey
         # Pega o conteudo da resposta
@@ -27,7 +27,7 @@ class ApiController():
         # Pega o conteudo da resposta
         response = requests.get(requestUrl)
         # Separa os dados do filme
-        results = json.loads(responsecontent)
+        results = json.loads(response.content)
         # Checa se a request deu certo
         results = self.verifyRequest(response, results)
         if (results != False):
@@ -83,8 +83,8 @@ class ApiController():
             self.mainController.populateCredit(results, personId, creditId)
 
     # Procura por uma pessoa especifica pelo input do usuário
-    def searchPerson(self):
-        query = str(input('Digite a pessoa pela qual deseja pesquisar: '))
+    def searchPerson(self, personName):
+        query = str(personName)
         # Monta a url da request que será feita
         requestUrl = "https://api.themoviedb.org/3/search/person?query=" + query + "&api_key=" + self.apiKey
         # Pega o conteudo da resposta
